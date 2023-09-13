@@ -6,27 +6,29 @@ import pickle
 from rich.table import Table
 from rich.console import Console
 
-
 import task
-
 
 
 class App:
     def __init__(self):
         self._task_list = []
-        self._index = 0
 
 
     def main(self):
         self.display_menu()
 
 
+    def display_title(self):
+        os.system('title Todolist-Python')
+        print("Welcome in the Todolist-Python")
+
+
     # functions menu
 
     def display_menu(self):
-        self._task_list = self.load()
         self.clear_console()
-        print("Welcome in the Todolist-Python")
+        self.display_title()
+        self._task_list = self.load()
         print()
         self.display_task_list()
         print()
@@ -103,10 +105,12 @@ class App:
 
 
     def create(self):
-        new_task = task.Task(self._index)
+        i_index = 0
+        for index, item in enumerate(self._task_list):
+            i_index = item._index
+        new_task = task.Task(i_index+1)
         self._task_list.append(new_task)
         self.save(self._task_list)
-        self._index = self._index + 1
         print("Task created!")
         time.sleep(2)
         self.display_menu()
@@ -135,7 +139,7 @@ class App:
         print("R Return")
         print()
         choice = input("Input a command: ").lower()
-        if choice == "R":
+        if choice == "r":
             self.display_menu()
         else:
             self.display_task(item)
@@ -158,7 +162,6 @@ class App:
 
     def update_task(self,item):
         self.clear_console()
-
         choice_name = input(f"Choose a new name for {item._name}: ")
         item._name = choice_name
         print("Name changed!")
@@ -189,10 +192,30 @@ class App:
 
 
     def delete(self):
-        print("delete")
+        self.clear_console()
+        self.display_task_list()
+        print("Which one do you want to delete?")
+        print("R return")
+        choice = input("Choose a task: ").lower()
+        for index, item in enumerate(self._task_list):
+            if choice == str(item._index):
+                self.delete_task(item)
+            elif choice == "r":
+                self.display_menu()
+        else:
+            self.delete()
+
+
+    def delete_task(self,item):
+        self.clear_console()
+        self._task_list.remove(item)
+        self.save(self._task_list)
+        print("Task removed!")
         time.sleep(2)
         self.display_menu()
 
+
+    # functions data
 
     def save(self,data):
         pickle.dump(data, open("save/SaveFile","wb"))
